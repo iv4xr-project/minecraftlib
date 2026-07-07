@@ -1,0 +1,21 @@
+diamond_pickaxe, stone 64,,,
+|stone, stone, stone, stone, stone
+stone, stone, stone, stone, stone
+stone, stone, stone, stone, stone
+stone, stone, stone, stone, stone
+stone, stone, stone, stone, stone
+|@player, , , ,
+, , , ,
+, ,, ,
+, , , ,
+, , , , diamond_block^target
+|, , , ,
+, , , ,
+, , , ,
+, , , ,
+, , , ,
+|, , , ,
+, , , ,
+, , , ,
+, , , ,
+, , , ,
