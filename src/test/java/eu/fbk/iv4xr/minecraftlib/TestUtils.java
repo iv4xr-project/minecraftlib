@@ -3,12 +3,15 @@ package eu.fbk.iv4xr.minecraftlib;
 import static nl.uu.cs.aplib.AplibEDSL.SEQ;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.logging.Logger;
 
@@ -38,15 +41,19 @@ public class TestUtils {
      * @param csvName
      * @return
      */
-    public static String levelPath(String csvName) {
-        URL url = TestUtils.class.getResource("/levels/" + csvName);
-        if (url == null) {
-            throw new IllegalStateException("Level resource not found on classpath: /levels/" + csvName);
-        }
-        try {
-            return new File(url.toURI()).getAbsolutePath();
-        } catch (URISyntaxException e) {
-            return new File(url.getPath()).getAbsolutePath();
+    public static String getLevel(String csvName) {
+        try (InputStream inputStream = TestUtils.class.getResourceAsStream("/levels/" + csvName)) {
+            if (inputStream == null) {
+                throw new IllegalStateException(
+                    "Level resource not found on classpath: /levels/" + csvName
+                );
+            }
+
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new IllegalStateException(
+                "Failed to read level resource: /levels/" + csvName, e
+            );
         }
     }
     

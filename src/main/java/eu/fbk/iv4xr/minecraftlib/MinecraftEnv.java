@@ -30,9 +30,6 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	final HttpClient http;
 	final Gson gson = new Gson();
 
-	// store the last level for reset
-	private String lastLevelCsv;
-
 	// Counter used as the WorldModel timestamp.
 	long tick = 0;
 
@@ -69,29 +66,32 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	@Override
 	public WorldModel observe(String agentId) {
-		JsonObject status = getJson("/status");
+		JsonObject status = getJson("/"+ agentId + "/status");
 		instrument(new EnvOperation(agentId, null, CMD_OBSERVE, null, WorldModel.class));
 		return StatusToWorldModel.convert(agentId, status, tick++);
 	}
 
+	public void joinServer(MinecraftAgent agent) {
+		postJson("/"+ agent.getId() + "/join/" + agent.getServerUrl(), new JsonObject());
+	}
+	
 	/**
 	 * Call the build level service and save the tags
 	 * 
-	 * @param levelCsv
+	 * @param levelData
 	 * @param x
 	 * @param y
 	 * @param z
 	 * @return
 	 */
-	public Map<String, Vec3> buildLevel(String levelCsv, int x, int y, int z) {
+	public Map<String, Vec3> buildLevel(String agentId, String levelData, int x, int y, int z) {
 		JsonObject jmsg = new JsonObject();
-		jmsg.addProperty("level_csv", levelCsv);
+		jmsg.addProperty("level_csv", levelData);
 		jmsg.addProperty("x", x);
 		jmsg.addProperty("y", y);
 		jmsg.addProperty("z", z);
-		JsonObject resp = postJson("/build-level", jmsg);
+		JsonObject resp = postJson("/" + agentId + "/build-level", jmsg);
 		cacheTags(resp);
-		this.lastLevelCsv = levelCsv;
 		return new HashMap<>(tagPositions);
 	}
 
@@ -100,8 +100,6 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	@Override
 	public void resetWorker() {
-		JsonObject resp = postJson("/reset", new JsonObject());
-		cacheTags(resp);
 	}
 
 	/////////////////////////////////////////////////////
@@ -130,7 +128,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	@Override
 	protected Object sendCommand_(EnvOperation cmd) {
 		JsonObject action = (JsonObject) cmd.arg;
-		JsonObject resp = postJson("/action", action);
+		JsonObject resp = postJson("/" + cmd.invokerId + "/action", action);
 		if (resp != null && resp.has("result") && !resp.get("result").isJsonNull()) {
 			return resp.get("result").getAsBoolean();
 		}

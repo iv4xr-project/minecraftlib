@@ -1,32 +1,26 @@
 package eu.fbk.iv4xr.minecraftlib;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import java.util.logging.Logger;
-
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import eu.iv4xr.framework.mainConcepts.TestAgent;
-import eu.iv4xr.framework.mainConcepts.TestDataCollector;
-import eu.iv4xr.framework.spatial.Vec3;
-import nl.uu.cs.aplib.mainConcepts.GoalStructure;
-import static nl.uu.cs.aplib.AplibEDSL.SEQ;
 import static eu.fbk.iv4xr.minecraftlib.TestUtils.TESTBENCH_URL;
 import static eu.fbk.iv4xr.minecraftlib.TestUtils.TEST_AGENT;
 import static eu.fbk.iv4xr.minecraftlib.TestUtils.assumeTestBenchRunning;
-import static eu.fbk.iv4xr.minecraftlib.TestUtils.levelPath;
-import static eu.fbk.iv4xr.minecraftlib.TestUtils.runAgent;
-import static eu.fbk.iv4xr.minecraftlib.TestUtils.logVerdicts;
-import static eu.fbk.iv4xr.minecraftlib.TestUtils.totalVerdicts;
 import static eu.fbk.iv4xr.minecraftlib.TestUtils.attackWithSword;
+import static eu.fbk.iv4xr.minecraftlib.TestUtils.getLevel;
+import static eu.fbk.iv4xr.minecraftlib.TestUtils.logVerdicts;
+import static eu.fbk.iv4xr.minecraftlib.TestUtils.runAgent;
+import static eu.fbk.iv4xr.minecraftlib.TestUtils.totalVerdicts;
+import static nl.uu.cs.aplib.AplibEDSL.SEQ;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.logging.Logger;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+
+import eu.iv4xr.framework.mainConcepts.TestDataCollector;
+import eu.iv4xr.framework.spatial.Vec3;
+import nl.uu.cs.aplib.mainConcepts.GoalStructure;
 
 
 
@@ -51,10 +45,11 @@ public class MinecraftGoalLibTest {
         MinecraftState state = new MinecraftState();
         MinecraftGoalLib goalLib = new MinecraftGoalLib();
 
-        TestAgent agent = new TestAgent(TEST_AGENT, "tester");
+        MinecraftAgent agent = new MinecraftAgent(TEST_AGENT, "localhost");
         agent.setTestDataCollector(new TestDataCollector());
 
-        env.buildLevel(levelPath("aplib-demo.csv"), 16, 65, 0);
+        agent.attachState(state).attachEnvironment(env);
+        env.buildLevel(TEST_AGENT, getLevel("aplib-demo.csv"), 16, 65, 0);
 
         GoalStructure G = SEQ(
                 goalLib.selected("diamond_pickaxe"),
@@ -62,7 +57,7 @@ public class MinecraftGoalLibTest {
                 goalLib.assertHasItem(agent, "stone", 64),
                 goalLib.assertBlockIs(agent, "target", "diamond_block", null));
 
-        agent.attachState(state).attachEnvironment(env).setGoal(G);
+        agent.setGoal(G);
         runAgent(agent, state, G);
 
         assertTrue(G.getStatus().success(), "top goal should be solved: " + G.getStatus());
@@ -83,11 +78,12 @@ public class MinecraftGoalLibTest {
         MinecraftState state = new MinecraftState();
         MinecraftGoalLib goalLib = new MinecraftGoalLib();
 
-        TestAgent agent = new TestAgent(TEST_AGENT, "tester");
+        MinecraftAgent agent = new MinecraftAgent(TEST_AGENT, "localhost");
         agent.setTestDataCollector(new TestDataCollector());
-
+        
+        agent.attachState(state).attachEnvironment(env);
         // 20x20 diamond base at (0,65,0); wood blocks sit at y=66 on each corner.
-        env.buildLevel(levelPath("wood-corners.csv"), 0, 65, 0);
+        env.buildLevel(TEST_AGENT, getLevel("wood-corners.csv"), 0, 65, 0);
 
         GoalStructure G = SEQ(
                 goalLib.reached(new Vec3(0, 66, 0), 2),
@@ -99,7 +95,7 @@ public class MinecraftGoalLibTest {
                 goalLib.reached(new Vec3(19, 66, 19), 2),
                 goalLib.assertBlockIs(agent, new Vec3(19, 66, 19), "jungle_log", null));
 
-        agent.attachState(state).attachEnvironment(env).setGoal(G);
+        agent.setGoal(G);
         runAgent(agent, state, G);
 
         assertTrue(G.getStatus().success(),
@@ -124,22 +120,24 @@ public class MinecraftGoalLibTest {
         MinecraftState state = new MinecraftState();
         MinecraftGoalLib goalLib = new MinecraftGoalLib();
 
-        TestAgent agent = new TestAgent(TEST_AGENT, "tester");
+        MinecraftAgent agent = new MinecraftAgent(TEST_AGENT, "localhost");
         agent.setTestDataCollector(new TestDataCollector());
 
         logger.info("anvil-test: the underlying game check is EXPECTED TO FAIL — combining two "
                 + "iron_helmets on an anvil yields ONE repaired helmet, not two, so "
                 + "check_inventory(iron_helmet, count=2) correctly returns false. This minecraftlib "
                 + "test passes by confirming that expected negative verdict.");
-
-        env.buildLevel(levelPath("anvil-test.csv"), 16, 65, 0);
+        
+        agent.attachState(state);
+        agent.attachEnvironment(env);
+        env.buildLevel(TEST_AGENT, getLevel("anvil-test.csv"), 16, 65, 0);
 
         GoalStructure G = SEQ(
                 goalLib.usedAnvil("anvil", "iron_helmet", "iron_helmet", "test"),
                 goalLib.waited(20),
                 goalLib.assertHasItem(agent, "iron_helmet", 2));
 
-        agent.attachState(state).attachEnvironment(env).setGoal(G);
+        agent.setGoal(G);
         runAgent(agent, state, G);
 
         assertTrue(G.getStatus().success(), "anvil scenario should run to completion: " + G.getStatus());
@@ -169,7 +167,7 @@ public class MinecraftGoalLibTest {
         MinecraftState state = new MinecraftState();
         MinecraftGoalLib goalLib = new MinecraftGoalLib();
 
-        TestAgent agent = new TestAgent(TEST_AGENT, "tester");
+        MinecraftAgent agent = new MinecraftAgent(TEST_AGENT, "localhost");
         agent.setTestDataCollector(new TestDataCollector());
 
         logger.info("MC-3697: the underlying game checks are EXPECTED TO FAIL — this reproduces "
@@ -178,7 +176,8 @@ public class MinecraftGoalLibTest {
                 + "existence checks correctly return false. This minecraftlib test passes by "
                 + "confirming those expected negative verdicts.");
 
-        env.buildLevel(levelPath("MC-3697.csv"), 16, 65, 0);
+        agent.attachState(state).attachEnvironment(env);
+        env.buildLevel(TEST_AGENT, getLevel("MC-3697.csv"), 16, 65, 0);
 
         GoalStructure G = SEQ(
                 goalLib.clicked("tnt"),
@@ -187,7 +186,7 @@ public class MinecraftGoalLibTest {
                 goalLib.assertEntityHealth(agent, "i1", null),
                 goalLib.assertEntityHealth(agent, "p1", null));
 
-        agent.attachState(state).attachEnvironment(env).setGoal(G);
+        agent.setGoal(G);
         runAgent(agent, state, G);
 
         assertTrue(G.getStatus().success(), "MC-3697 scenario should run to completion: " + G.getStatus());
@@ -215,10 +214,12 @@ public class MinecraftGoalLibTest {
         MinecraftState state = new MinecraftState();
         MinecraftGoalLib goalLib = new MinecraftGoalLib();
 
-        TestAgent agent = new TestAgent(TEST_AGENT, "tester");
+        MinecraftAgent agent = new MinecraftAgent(TEST_AGENT, "localhost");
         agent.setTestDataCollector(new TestDataCollector());
 
-        env.buildLevel(levelPath("damage.csv"), 16, 65, 0);
+        agent.attachState(state);
+        agent.attachEnvironment(env);
+        env.buildLevel(TEST_AGENT, getLevel("damage.csv"), 16, 65, 0);
 
         GoalStructure G = SEQ(
                 // baseline: the golem starts at full health
@@ -229,7 +230,7 @@ public class MinecraftGoalLibTest {
                 attackWithSword(goalLib, agent, "diamond_sword", 78f),
                 attackWithSword(goalLib, agent, "netherite_sword", 70f));
 
-        agent.attachState(state).attachEnvironment(env).setGoal(G);
+        agent.setGoal(G);
         runAgent(agent, state, G);
 
         assertTrue(G.getStatus().success(),
