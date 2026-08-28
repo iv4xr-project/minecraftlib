@@ -102,6 +102,8 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	public void resetWorker() {
 	}
 
+		
+	
 	/////////////////////////////////////////////////////
 	///
 	/// Minecraft actions
@@ -190,6 +192,10 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	public boolean mine(String agentId, Vec3 pos) {
 		return sendAction(agentId, null, withCoords(action("break"), pos));
+	}
+	
+	public void resetAgent(String agentId) {
+		postJson( "/" + agentId + "/reset", null);
 	}
 
 	/**
