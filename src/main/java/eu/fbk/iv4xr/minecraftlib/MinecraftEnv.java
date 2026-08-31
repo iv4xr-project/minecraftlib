@@ -195,7 +195,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	}
 	
 	public void resetAgent(String agentId) {
-		postJson( "/" + agentId + "/reset", null);
+		postJson( "/" + agentId + "/reset", new JsonObject());
 	}
 
 	/**
