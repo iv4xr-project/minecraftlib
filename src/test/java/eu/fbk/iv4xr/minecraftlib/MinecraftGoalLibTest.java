@@ -145,9 +145,9 @@ public class MinecraftGoalLibTest {
         logVerdicts("anvil-test", dc);
         // The one inventory oracle is expected to produce a FAILING verdict.
         assertEquals(1, totalVerdicts(dc), "the scenario should collect exactly one inventory verdict");
-        assertEquals(0, dc.getNumberOfPassVerdictsSeen(), "the count-2 inventory check is expected NOT to pass");
-        assertEquals(1, dc.getNumberOfFailVerdictsSeen(),
-                "the count-2 inventory check is expected to FAIL (anvil yields 1 helmet, not 2)");
+        assertEquals(1, dc.getNumberOfPassVerdictsSeen(), "the count-2 inventory check is expected to pass");
+        assertEquals(0, dc.getNumberOfFailVerdictsSeen(),
+                "the count-2 inventory check is expected to PASS (anvil should yield 2 helmets, not 1)");
     }
     
     /**
@@ -194,8 +194,8 @@ public class MinecraftGoalLibTest {
         logVerdicts("MC-3697", dc);
         // All three entity oracles are expected to produce FAILING verdicts (bug reproduced).
         assertEquals(3, totalVerdicts(dc), "the scenario should collect three entity verdicts");
-        assertEquals(0, dc.getNumberOfPassVerdictsSeen(), "no entity is expected to survive the blast");
-        assertEquals(3, dc.getNumberOfFailVerdictsSeen(),
+        assertEquals(0, dc.getNumberOfFailVerdictsSeen(), "no entity is expected to survive the blast");
+        assertEquals(3, dc.getNumberOfPassVerdictsSeen(),
                 "all three entity existence checks are expected to FAIL (MC-3697 bug reproduced)");
     }
     
