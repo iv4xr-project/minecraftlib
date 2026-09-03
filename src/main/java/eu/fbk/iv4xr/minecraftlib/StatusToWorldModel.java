@@ -27,6 +27,7 @@ public class StatusToWorldModel {
 
 	public static final String HEALTH = "health";
 	public static final String FOOD = "food";
+	public static final String VERSION = "version";
 	public static final String STATUS = "status";
 	public static final String LAST_ACTION_RESULT = "lastActionResult";
 	public static final String INVENTORY = "inventory";
@@ -58,6 +59,10 @@ public class StatusToWorldModel {
 		
 		if (has(status, FOOD)) {
 			agent.properties.put(FOOD, (float) status.get(FOOD).getAsDouble());
+		}
+		
+		if (has(status, VERSION)) {
+			agent.properties.put(VERSION, status.get(VERSION).getAsString());
 		}
 		
 		if (has(status, STATUS)) {

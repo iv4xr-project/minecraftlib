@@ -385,13 +385,11 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 * @param nbt
 	 * @return
 	 */
-	public boolean checkBlock(String agentId, String tag, String expected, String nbt) {
+	public boolean checkBlock(String agentId, String tag, String expected, String nbt, Boolean result) {
 		JsonObject a = action("check_block");
 		a.addProperty("target", tag);
 		a.addProperty("expected", expected);
-		if (nbt != null) {
-			a.addProperty("nbt", nbt);
-		}
+		a.addProperty("expect_result", result);
 		return sendAction(agentId, tag, a);
 	}
 
@@ -404,12 +402,11 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 * @param nbt
 	 * @return
 	 */
-	public boolean checkBlock(String agentId, Vec3 pos, String expected, String nbt) {
+	public boolean checkBlock(String agentId, Vec3 pos, String expected, String nbt, Boolean result) {
 		JsonObject a = withCoords(action("check_block"), pos);
 		a.addProperty("expected", expected);
-		if (nbt != null) {
-			a.addProperty("nbt", nbt);
-		}
+		a.addProperty("nbt", nbt);
+		a.addProperty("expect_result", result);
 		return sendAction(agentId, null, a);
 	}
 
@@ -421,12 +418,12 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 * @param count
 	 * @return
 	 */
-	public boolean checkInventory(String agentId, String item, Integer count) {
+	public boolean checkInventory(String agentId, String item, Integer count, Boolean result) {
 		JsonObject a = action("check_inventory");
 		a.addProperty("item", item);
-		if (count != null) {
-			a.addProperty("count", count);
-		}
+		a.addProperty("count", count);
+		a.addProperty("expect_result", result);
+		
 		return sendAction(agentId, null, a);
 	}
 
@@ -438,13 +435,29 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 * @param health
 	 * @return
 	 */
-	public boolean checkEntity(String agentId, String targetTagOrUuid, Float health) {
+	public boolean checkEntity(String agentId, String targetTagOrUuid, Float health, String nbt, Boolean result) {
 		JsonObject a = action("check_entity");
 		a.addProperty("target", targetTagOrUuid);
-		if (health != null) {
-			a.addProperty("health", health);
-		}
+		a.addProperty("health", health);
+		a.addProperty("nbt", nbt);
+		a.addProperty("expect_result", result);
 		return sendAction(agentId, targetTagOrUuid, a);
+	}
+	
+	/**
+	 * Check whether the  
+	 * 
+	 * @param agentId
+	 * @param targetTagOrUuid
+	 * @param health
+	 * @return
+	 */
+	public boolean checkAdvancement(String agentId, String advancement, Boolean result) {
+		JsonObject a = action("check_advancement");
+		a.addProperty("advancement", advancement);
+		a.addProperty("expect_result", result);
+
+		return sendAction(agentId, null, a);
 	}
 
 	/////////////////////////////////////////////////////

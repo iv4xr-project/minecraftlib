@@ -172,7 +172,7 @@ public class MinecraftGoalLib {
 	 * @param count
 	 * @return
 	 */
-	public GoalStructure craft(String tag, String item, Integer count) {
+	public GoalStructure crafted(String tag, String item, Integer count) {
 		return goal("Craft " + item + " @ " + tag).toSolve((Boolean ok) -> ok != null && ok)
 				.withTactic(tacticLib.craft(tag, item, count)).lift();
 	}
@@ -197,11 +197,11 @@ public class MinecraftGoalLib {
 	 * @param nbt
 	 * @return
 	 */
-	public GoalStructure assertBlockIs(TestAgent ta, String tag, String expected, String nbt) {
+	public GoalStructure assertBlockIs(TestAgent ta, String tag, String expected, String nbt, Boolean result) {
 		String info = "block@" + tag + "==" + expected;
 		return testgoal("Assert " + info, ta).toSolve((Boolean checked) -> true)
 				.oracle(ta, (Boolean checked) -> assertTrue_("block-check", info, checked != null && checked))
-				.withTactic(tacticLib.checkBlock(tag, expected, nbt)).lift();
+				.withTactic(tacticLib.checkBlock(tag, expected, nbt, result)).lift();
 	}
 
 	/**
@@ -212,11 +212,11 @@ public class MinecraftGoalLib {
 	 * @param nbt
 	 * @return
 	 */
-	public GoalStructure assertBlockIs(TestAgent ta, Vec3 pos, String expected, String nbt) {
+	public GoalStructure assertBlockIs(TestAgent ta, Vec3 pos, String expected, String nbt, Boolean result) {
 		String info = "block@" + pos + "==" + expected;
 		return testgoal("Assert " + info, ta).toSolve((Boolean checked) -> true)
 				.oracle(ta, (Boolean checked) -> assertTrue_("block-check", info, checked != null && checked))
-				.withTactic(tacticLib.checkBlock(pos, expected, nbt)).lift();
+				.withTactic(tacticLib.checkBlock(pos, expected, nbt, result)).lift();
 	}
 	
 	/**
@@ -226,12 +226,12 @@ public class MinecraftGoalLib {
 	 * @param count
 	 * @return
 	 */
-    public GoalStructure assertHasItem(TestAgent ta, String item, Integer count) {
+    public GoalStructure assertHasItem(TestAgent ta, String item, Integer count, Boolean result) {
         String info = "inventory has " + (count == null ? 1 : count) + "x " + item;
         return testgoal("Assert " + info, ta)
                 .toSolve((Boolean checked) -> true)
                 .oracle(ta, (Boolean checked) -> assertTrue_("inventory-check", info, checked != null && checked))
-                .withTactic(tacticLib.checkInventory(item, count))
+                .withTactic(tacticLib.checkInventory(item, count, result))
                 .lift();
     }
     
@@ -242,12 +242,27 @@ public class MinecraftGoalLib {
      * @param health
      * @return
      */
-    public GoalStructure assertEntityHealth(TestAgent ta, String target, Float health) {
+    public GoalStructure assertEntity(TestAgent ta, String target, Float health, String nbt, Boolean result) {
         String info = "entity " + target + (health == null ? " present" : " health==" + health);
         return testgoal("Assert " + info, ta)
                 .toSolve((Boolean checked) -> true)
                 .oracle(ta, (Boolean checked) -> assertTrue_("entity-check", info, checked != null && checked))
-                .withTactic(tacticLib.checkEntity(target, health))
+                .withTactic(tacticLib.checkEntity(target, health, nbt, result))
+                .lift();
+    }
+    
+    
+    /**
+     * Assert the bot has the advancement
+     * @param advancement
+     * @return
+     */
+    public GoalStructure assertAdvancement(TestAgent ta, String advancement, Boolean result) {
+        String info = result == null || !result ? "has" : "does not have" + " advancement " + advancement;
+        return testgoal("Assert " + info, ta)
+                .toSolve((Boolean checked) -> true)
+                .oracle(ta, (Boolean checked) -> assertTrue_("advancement-check", info, checked != null && checked))
+                .withTactic(tacticLib.checkAdvancment(advancement, result))
                 .lift();
     }
 

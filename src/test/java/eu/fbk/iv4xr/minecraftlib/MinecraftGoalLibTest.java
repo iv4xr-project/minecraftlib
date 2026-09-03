@@ -53,9 +53,9 @@ public class MinecraftGoalLibTest {
 
         GoalStructure G = SEQ(
                 goalLib.selected("diamond_pickaxe"),
-                goalLib.assertHasItem(agent, "diamond_pickaxe", 1),
-                goalLib.assertHasItem(agent, "stone", 64),
-                goalLib.assertBlockIs(agent, "target", "diamond_block", null));
+                goalLib.assertHasItem(agent, "diamond_pickaxe", 1, true),
+                goalLib.assertHasItem(agent, "stone", 64, true),
+                goalLib.assertBlockIs(agent, "target", "diamond_block", null, true));
 
         agent.setGoal(G);
         runAgent(agent, state, G);
@@ -87,13 +87,13 @@ public class MinecraftGoalLibTest {
 
         GoalStructure G = SEQ(
                 goalLib.reached(new Vec3(0, 66, 0), 2),
-                goalLib.assertBlockIs(agent, new Vec3(0, 66, 0), "oak_log", null),
+                goalLib.assertBlockIs(agent, new Vec3(0, 66, 0), "oak_log", null, true),
                 goalLib.reached(new Vec3(19, 66, 0), 2),
-                goalLib.assertBlockIs(agent, new Vec3(19, 66, 0), "spruce_log", null),
+                goalLib.assertBlockIs(agent, new Vec3(19, 66, 0), "spruce_log", null, true),
                 goalLib.reached(new Vec3(0, 66, 19), 2),
-                goalLib.assertBlockIs(agent, new Vec3(0, 66, 19), "birch_log", null),
+                goalLib.assertBlockIs(agent, new Vec3(0, 66, 19), "birch_log", null, true),
                 goalLib.reached(new Vec3(19, 66, 19), 2),
-                goalLib.assertBlockIs(agent, new Vec3(19, 66, 19), "jungle_log", null));
+                goalLib.assertBlockIs(agent, new Vec3(19, 66, 19), "jungle_log", null, true));
 
         agent.setGoal(G);
         runAgent(agent, state, G);
@@ -135,7 +135,7 @@ public class MinecraftGoalLibTest {
         GoalStructure G = SEQ(
                 goalLib.usedAnvil("anvil", "iron_helmet", "iron_helmet", "test"),
                 goalLib.waited(20),
-                goalLib.assertHasItem(agent, "iron_helmet", 2));
+                goalLib.assertHasItem(agent, "iron_helmet", 2, true));
 
         agent.setGoal(G);
         runAgent(agent, state, G);
@@ -182,9 +182,9 @@ public class MinecraftGoalLibTest {
         GoalStructure G = SEQ(
                 goalLib.clicked("tnt"),
                 goalLib.waited(80),
-                goalLib.assertEntityHealth(agent, "if1", null),
-                goalLib.assertEntityHealth(agent, "i1", null),
-                goalLib.assertEntityHealth(agent, "p1", null));
+                goalLib.assertEntity(agent, "if1", null, null, true),
+                goalLib.assertEntity(agent, "i1" , null, null, true),
+                goalLib.assertEntity(agent, "p1" , null, null, true));
 
         agent.setGoal(G);
         runAgent(agent, state, G);
@@ -223,7 +223,7 @@ public class MinecraftGoalLibTest {
 
         GoalStructure G = SEQ(
                 // baseline: the golem starts at full health
-                goalLib.assertEntityHealth(agent, "mob", 100f),
+                goalLib.assertEntity(agent, "mob", 100f, null, true),
                 attackWithSword(goalLib, agent, "wooden_sword", 96f),
                 attackWithSword(goalLib, agent, "stone_sword", 91f),
                 attackWithSword(goalLib, agent, "iron_sword", 85f),

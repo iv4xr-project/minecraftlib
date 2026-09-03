@@ -272,9 +272,9 @@ public class MinecraftTacticLib {
 	 * @param nbt
 	 * @return
 	 */
-	public Tactic checkBlock(String tag, String expected, String nbt) {
+	public Tactic checkBlock(String tag, String expected, String nbt, Boolean result) {
 		return action("check_block " + tag)
-				.do1((MinecraftState S) -> (Object) S.env().checkBlock(getAgentId(S), tag, expected, nbt)).lift();
+				.do1((MinecraftState S) -> (Object) S.env().checkBlock(getAgentId(S), tag, expected, nbt, result)).lift();
 	}
 
 	/**
@@ -285,9 +285,9 @@ public class MinecraftTacticLib {
 	 * @param nbt
 	 * @return
 	 */
-	public Tactic checkBlock(Vec3 pos, String expected, String nbt) {
+	public Tactic checkBlock(Vec3 pos, String expected, String nbt, Boolean result) {
 		return action("check_block " + pos)
-				.do1((MinecraftState S) -> (Object) S.env().checkBlock(getAgentId(S), pos, expected, nbt)).lift();
+				.do1((MinecraftState S) -> (Object) S.env().checkBlock(getAgentId(S), pos, expected, nbt, result)).lift();
 	}
 
 	/**
@@ -297,9 +297,9 @@ public class MinecraftTacticLib {
 	 * @param count
 	 * @return
 	 */
-	public Tactic checkInventory(String item, Integer count) {
+	public Tactic checkInventory(String item, Integer count, Boolean result) {
 		return action("check_inventory " + item)
-				.do1((MinecraftState S) -> (Object) S.env().checkInventory(getAgentId(S), item, count)).lift();
+				.do1((MinecraftState S) -> (Object) S.env().checkInventory(getAgentId(S), item, count, result)).lift();
 	}
 
 	/**
@@ -309,8 +309,20 @@ public class MinecraftTacticLib {
 	 * @param health
 	 * @return
 	 */
-	public Tactic checkEntity(String target, Float health) {
+	public Tactic checkEntity(String target, Float health, String nbt, Boolean result) {
 		return action("check_entity " + target)
-				.do1((MinecraftState S) -> (Object) S.env().checkEntity(getAgentId(S), target, health)).lift();
+				.do1((MinecraftState S) -> (Object) S.env().checkEntity(getAgentId(S), target, health, nbt, result)).lift();
+	}
+	
+	/**
+	 * Check if the bot has an advancement
+	 * 
+	 * @param advancement
+	 * @param result
+	 * @return
+	 */
+	public Tactic checkAdvancment(String advancement, Boolean result) {
+		return action("check_advancement " + advancement)
+				.do1((MinecraftState S) -> (Object) S.env().checkAdvancement(getAgentId(S), advancement, result)).lift();
 	}
 }

@@ -69,6 +69,11 @@ public class MinecraftState extends Iv4xrAgentState<Void> {
 		WorldEntity a = getAgent();
 		return a == null ? null : (Float) a.properties.get("health");
 	}
+	
+	public String getVersion() {
+		WorldEntity a = getAgent();
+		return a == null ? null : (String) a.properties.get("version");
+	}
 
 	public boolean isAgentAlive() {
 		Float hp = getHealth();

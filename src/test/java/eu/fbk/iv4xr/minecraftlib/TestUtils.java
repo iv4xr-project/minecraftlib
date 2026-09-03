@@ -131,7 +131,7 @@ public class TestUtils {
                 goalLib.waited(20),
                 goalLib.attacked("mob"),
                 goalLib.waited(5),
-                goalLib.assertEntityHealth(agent, "mob", expectedMobHealth));
+                goalLib.assertEntity(agent, "mob", expectedMobHealth, null, true));
     }
     
 
