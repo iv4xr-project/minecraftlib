@@ -182,6 +182,17 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 		a.addProperty("target", tag);
 		return sendAction(agentId, tag, a);
 	}
+	
+	/**
+	 * Jump
+	 * 
+	 * @param agentId
+	 * @return
+	 */
+	public boolean jump(String agentId) {
+		JsonObject a = action("jump");
+		return sendAction(agentId, null, a);
+	}
 
 	/**
 	 * Mine at coordinates
@@ -199,17 +210,49 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	}
 
 	/**
-	 * Place object with tag
+	 * Place block on referenced block face
 	 * 
 	 * @param agentId
 	 * @param tag
 	 * @param face
 	 * @return
 	 */
-	public boolean place(String agentId, String tag, String face) {
-		JsonObject a = action("place");
+	public boolean placeOn(String agentId, String tag, String face) {
+		JsonObject a = action("place_on");
 		a.addProperty("target", tag);
 		a.addProperty("face", face);
+		return sendAction(agentId, tag, a);
+	}
+	
+	
+	/**
+	 * Craft an item with 
+	 * 
+	 * @param agentId
+	 * @param tag (crafting table location if applicable)
+	 * @param item (to craft)
+	 * @param count
+	 * @return
+	 */
+	public boolean craft(String agentId, String tag, String item, Integer count) {
+		JsonObject a = action("craft");
+		a.addProperty("target", tag);
+		a.addProperty("item", item);
+		a.addProperty("count", count);
+		return sendAction(agentId, tag, a);
+	}
+	
+	
+	/**
+	 * Place block at coordinates
+	 * 
+	 * @param agentId
+	 * @param tag
+	 * @return
+	 */
+	public boolean rawPlace(String agentId, String tag) {
+		JsonObject a = action("place");
+		a.addProperty("target", tag);
 		return sendAction(agentId, tag, a);
 	}
 
@@ -256,17 +299,15 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 * Pick up loot specified by a tag
 	 * 
 	 * @param agentId
-	 * @param tag
 	 * @return
 	 */
-	public boolean pickUpLoot(String agentId, String tag) {
+	public boolean pickUpLoot(String agentId) {
 		JsonObject a = action("pick_up_loot");
-		a.addProperty("target", tag);
-		return sendAction(agentId, tag, a);
+		return sendAction(agentId, null, a);
 	}
 
 	/**
-	 * Left hand click to a target
+	 * Right hand click to a target
 	 * 
 	 * @param agentId
 	 * @param tag
@@ -274,6 +315,19 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	public boolean click(String agentId, String tag) {
 		JsonObject a = action("click");
+		a.addProperty("target", tag);
+		return sendAction(agentId, tag, a);
+	}
+	
+	/**
+	 * Right click on an entity target with item
+	 * 
+	 * @param agentId
+	 * @param tag
+	 * @return
+	 */
+	public boolean useOnEntity(String agentId, String tag) {
+		JsonObject a = action("use_on_entity");
 		a.addProperty("target", tag);
 		return sendAction(agentId, tag, a);
 	}

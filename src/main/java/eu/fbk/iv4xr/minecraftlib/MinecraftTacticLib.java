@@ -100,15 +100,29 @@ public class MinecraftTacticLib {
 	}
 
 	/**
-	 * Place a tagged object
+	 * Place on a tagged object
 	 * 
 	 * @param tag
 	 * @param face
 	 * @return
 	 */
-	public Tactic place(String tag, String face) {
+	public Tactic placeOn(String tag, String face) {
+		return action("place_on " + tag).do1((MinecraftState S) -> {
+			boolean ok = S.env().placeOn(getAgentId(S), tag, face);
+			refreshWorldModel(S);
+			return (Object) ok;
+		}).lift();
+	}
+	
+	/**
+	 * Place a tagged object
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public Tactic rawPlace(String tag) {
 		return action("place " + tag).do1((MinecraftState S) -> {
-			boolean ok = S.env().place(getAgentId(S), tag, face);
+			boolean ok = S.env().rawPlace(getAgentId(S), tag);
 			refreshWorldModel(S);
 			return (Object) ok;
 		}).lift();
@@ -141,6 +155,20 @@ public class MinecraftTacticLib {
 			return (Object) ok;
 		}).lift();
 	}
+	
+	/**
+	 * Use an item on a tagged entity
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public Tactic useOnEntity(String tag) {
+		return action("use_on_entity " + tag).do1((MinecraftState S) -> {
+			boolean ok = S.env().useOnEntity(getAgentId(S), tag);
+			refreshWorldModel(S);
+			return (Object) ok;
+		}).lift();
+	}
 
 	/**
 	 * Pick up the loot
@@ -148,16 +176,16 @@ public class MinecraftTacticLib {
 	 * @param tag
 	 * @return
 	 */
-	public Tactic pickUpLoot(String tag) {
-		return action("pick_up_loot " + tag).do1((MinecraftState S) -> {
-			boolean ok = S.env().pickUpLoot(getAgentId(S), tag);
+	public Tactic pickUpLoot() {
+		return action("pick_up_loot ").do1((MinecraftState S) -> {
+			boolean ok = S.env().pickUpLoot(getAgentId(S));
 			refreshWorldModel(S);
 			return (Object) ok;
 		}).lift();
 	}
 
 	/**
-	 * Toggle snake (on/off)
+	 * Toggle sneak (on/off)
 	 * 
 	 * @param state
 	 * @return
@@ -165,6 +193,19 @@ public class MinecraftTacticLib {
 	public Tactic sneak(boolean state) {
 		return action("sneak " + state).do1((MinecraftState S) -> {
 			boolean ok = S.env().sneak(getAgentId(S), state);
+			refreshWorldModel(S);
+			return (Object) ok;
+		}).lift();
+	}
+	
+	/**
+	 * jump
+	 * 
+	 * @return
+	 */
+	public Tactic jump() {
+		return action("jump").do1((MinecraftState S) -> {
+			boolean ok = S.env().jump(getAgentId(S));
 			refreshWorldModel(S);
 			return (Object) ok;
 		}).lift();
@@ -196,6 +237,22 @@ public class MinecraftTacticLib {
 	public Tactic anvil(String tag, String itemOne, String itemTwo, String customName) {
 		return action("anvil " + tag).do1((MinecraftState S) -> {
 			boolean ok = S.env().anvil(getAgentId(S), tag, itemOne, itemTwo, customName);
+			refreshWorldModel(S);
+			return (Object) ok;
+		}).lift();
+	}
+	
+	/**
+	 * Craft an item with a crafting table
+	 * 
+	 * @param tag (crafting table location if applicable)
+	 * @param item (to craft)
+	 * @param count
+	 * @return
+	 */
+	public Tactic craft(String tag, String item, Integer count) {
+		return action("craft " + item).do1((MinecraftState S) -> {
+			boolean ok = S.env().craft(getAgentId(S), tag, item, count);
 			refreshWorldModel(S);
 			return (Object) ok;
 		}).lift();

@@ -76,15 +76,26 @@ public class MinecraftGoalLib {
 	}
 
 	/**
-	 * Select an item
+	 * Place a block on a tagged block
 	 * 
 	 * @param tag
 	 * @param face
 	 * @return
 	 */
-	public GoalStructure placed(String tag, String face) {
+	public GoalStructure placedOn(String tag, String face) {
 		return goal("Placed on " + tag + "/" + face).toSolve((Boolean ok) -> ok != null && ok)
-				.withTactic(tacticLib.place(tag, face)).lift();
+				.withTactic(tacticLib.placeOn(tag, face)).lift();
+	}
+	
+	/**
+	 * Place a block at a tagged position
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public GoalStructure placed(String tag) {
+		return goal("Placed " + tag).toSolve((Boolean ok) -> ok != null && ok)
+				.withTactic(tacticLib.rawPlace(tag)).lift();
 	}
 
 	/**
@@ -97,6 +108,27 @@ public class MinecraftGoalLib {
 		return goal("Attacked " + target).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.attack(target))
 				.lift();
 	}
+	
+	/**
+	 * Sneak
+	 * 
+	 * @param state
+	 * @return
+	 */
+	public GoalStructure sneaked(boolean state) {
+		return goal("Sneaked " + state).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.sneak(state))
+				.lift();
+	}
+	
+	/**
+	 * Jump
+	 * 
+	 * @return
+	 */
+	public GoalStructure jumped() {
+		return goal("Jumped").toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.jump())
+				.lift();
+	}
 
 	/**
 	 * Click
@@ -106,6 +138,16 @@ public class MinecraftGoalLib {
 	 */
 	public GoalStructure clicked(String tag) {
 		return goal("Clicked " + tag).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.click(tag)).lift();
+	}
+	
+	/**
+	 * UseOnEntity
+	 * 
+	 * @param tag
+	 * @return
+	 */
+	public GoalStructure usedOnEntity(String tag) {
+		return goal("Used on entity " + tag).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.useOnEntity(tag)).lift();
 	}
 
 	/**
@@ -118,8 +160,21 @@ public class MinecraftGoalLib {
 	 * @return
 	 */
 	public GoalStructure usedAnvil(String tag, String itemOne, String itemTwo, String customName) {
-		return goal("Anvil op at " + tag).toSolve((Boolean ok) -> ok != null && ok)
+		return goal("Anvil op @ " + tag).toSolve((Boolean ok) -> ok != null && ok)
 				.withTactic(tacticLib.anvil(tag, itemOne, itemTwo, customName)).lift();
+	}
+	
+	/**
+	 * Craft an item with a crafting table
+	 * 
+	 * @param tag (crafting table location if applicable)
+	 * @param item (to craft)
+	 * @param count
+	 * @return
+	 */
+	public GoalStructure craft(String tag, String item, Integer count) {
+		return goal("Craft " + item + " @ " + tag).toSolve((Boolean ok) -> ok != null && ok)
+				.withTactic(tacticLib.craft(tag, item, count)).lift();
 	}
 
 	/**
