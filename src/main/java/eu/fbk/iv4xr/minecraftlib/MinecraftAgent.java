@@ -35,5 +35,11 @@ public class MinecraftAgent extends TestAgent {
 		if (state() != null && state().env() != null) {
 			((MinecraftEnv) state().env()).joinServer(this);			
 		}
-	}	
+	}
+	
+	public void quit() {
+		if (state() != null && state().env() != null) {
+			((MinecraftEnv) state().env()).quit(this);			
+		}
+	}
 }

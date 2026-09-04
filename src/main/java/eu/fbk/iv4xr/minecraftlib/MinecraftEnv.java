@@ -12,6 +12,7 @@ import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -75,6 +76,10 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 		postJson("/"+ agent.getId() + "/join/" + agent.getServerUrl(), new JsonObject());
 	}
 	
+	public void quit(MinecraftAgent agent) {
+		deleteJson("/"+ agent.getId());
+	}
+	
 	/**
 	 * Call the build level service and save the tags
 	 * 
@@ -131,8 +136,8 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	protected Object sendCommand_(EnvOperation cmd) {
 		JsonObject action = (JsonObject) cmd.arg;
 		JsonObject resp = postJson("/" + cmd.invokerId + "/action", action);
-		if (resp != null && resp.has("result") && !resp.get("result").isJsonNull()) {
-			return resp.get("result").getAsBoolean();
+		if (resp != null && resp.has("passed") && !resp.get("passed").isJsonNull()) {
+			return resp.get("passed").getAsBoolean();
 		}
 		return null;
 	}
@@ -426,6 +431,22 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 		
 		return sendAction(agentId, null, a);
 	}
+	
+	/**
+	 * Check item components
+	 * 
+	 * @param agentId
+	 * @param components
+	 * @param result
+	 * @return
+	 */
+	public boolean checkItemComponents(String agentId, String item, Map<String, Object> components, Boolean result) {
+		JsonObject a = action("check_inventory");
+		a.addProperty("item", item);
+		components.forEach((key, value) -> a.add(key, gson.toJsonTree(value)));
+		a.addProperty("expect_result", result);
+		return sendAction(agentId, null, a);
+	}
 
 	/**
 	 * Check the health of an entity specified as a tag or an uuid
@@ -548,6 +569,31 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 			throw e;
 		} catch (Exception e) {
 			throw new Iv4xrError("GET " + path + " failed: " + e.getMessage());
+		}
+	}
+	
+	/**
+	 * HTTP Delete
+	 * 
+	 * @param path
+	 * @return
+	 */
+	JsonObject deleteJson(String path) {
+		try {
+			HttpRequest req = HttpRequest.newBuilder().uri(URI.create(mineflyerTestbenchUrl + path))
+					.timeout(Duration.ofSeconds(connectionTimeout)).header("Content-Type", "application/json")
+					.DELETE().build();
+			HttpResponse<String> resp = http.send(req, HttpResponse.BodyHandlers.ofString());
+			JsonObject json = resp.body() == null || resp.body().isBlank() ? new JsonObject()
+					: gson.fromJson(resp.body(), JsonObject.class);
+			if (resp.statusCode() >= 300) {
+				throw new Iv4xrError("DELETE " + path + " failed: HTTP " + resp.statusCode() + " " + resp.body());
+			}
+			return json;
+		} catch (Iv4xrError e) {
+			throw e;
+		} catch (Exception e) {
+			throw new Iv4xrError("DELETE " + path + " failed: " + e.getMessage());
 		}
 	}
 

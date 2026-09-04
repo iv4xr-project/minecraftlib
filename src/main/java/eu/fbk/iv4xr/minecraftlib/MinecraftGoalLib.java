@@ -6,6 +6,8 @@ import static eu.iv4xr.framework.Iv4xrEDSL.assertTrue_;
 import static eu.iv4xr.framework.Iv4xrEDSL.testgoal;
 import static nl.uu.cs.aplib.AplibEDSL.goal;
 
+import java.util.Map;
+
 import eu.iv4xr.framework.mainConcepts.TestAgent;
 import eu.iv4xr.framework.spatial.Vec3;
 
@@ -232,6 +234,21 @@ public class MinecraftGoalLib {
                 .toSolve((Boolean checked) -> true)
                 .oracle(ta, (Boolean checked) -> assertTrue_("inventory-check", info, checked != null && checked))
                 .withTactic(tacticLib.checkInventory(item, count, result))
+                .lift();
+    }
+    
+	/**
+	 * Assert the inventory contains an item with the exact components 
+	 * @param ta
+	 * @param components
+	 * @return
+	 */
+    public GoalStructure assertItemComponents(TestAgent ta, String item, Map<String, Object> components, Boolean result) {
+        String info = "inventory has " + item + " with components " + components;
+        return testgoal("Assert " + info, ta)
+                .toSolve((Boolean checked) -> true)
+                .oracle(ta, (Boolean checked) -> assertTrue_("inventory-check", info, checked != null && checked))
+                .withTactic(tacticLib.checkItemComponents(item, components, result))
                 .lift();
     }
     

@@ -2,6 +2,8 @@ package eu.fbk.iv4xr.minecraftlib;
 
 import static nl.uu.cs.aplib.AplibEDSL.action;
 
+import java.util.Map;
+
 import eu.iv4xr.framework.spatial.Vec3;
 import nl.uu.cs.aplib.mainConcepts.Tactic;
 
@@ -301,6 +303,19 @@ public class MinecraftTacticLib {
 		return action("check_inventory " + item)
 				.do1((MinecraftState S) -> (Object) S.env().checkInventory(getAgentId(S), item, count, result)).lift();
 	}
+	
+	/**
+	 * Check if there is an item with the precise item components
+	 * 
+	 * @param item
+	 * @param components
+	 * @return
+	 */
+	public Tactic checkItemComponents(String item, Map<String, Object> components, Boolean result) {
+		return action("check_inventory " + item)
+				.do1((MinecraftState S) -> (Object) S.env().checkItemComponents(getAgentId(S), item, components, result)).lift();
+	}
+
 
 	/**
 	 * Check the health of a target entity
