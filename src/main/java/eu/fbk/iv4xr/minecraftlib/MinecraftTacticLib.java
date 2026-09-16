@@ -199,6 +199,18 @@ public class MinecraftTacticLib {
 			return (Object) ok;
 		}).lift();
 	}
+	/**
+	 * Generic action, a way to call arbitrary json actions directly
+	 * @param action
+	 * @param params
+	 */
+	public Tactic genericActionTactic(String action, Map<String, Object> params) {
+		return action("Generic action \"" + action + "\"").do1((MinecraftState S) -> {
+			boolean ok = S.env().genericAction(getAgentId(S), action, params);
+			refreshWorldModel(S);
+			return (Object) ok;
+		}).lift();
+	}
 	
 	/**
 	 * jump
@@ -340,4 +352,15 @@ public class MinecraftTacticLib {
 		return action("check_advancement " + advancement)
 				.do1((MinecraftState S) -> (Object) S.env().checkAdvancement(getAgentId(S), advancement, result)).lift();
 	}
+	
+	/**
+	 * Generic assertion, a way to call arbitrary json actions directly
+	 * @param action
+	 * @param params
+	 */
+	public Tactic genericAssertionTactic(String action, Map<String, Object> params) {
+		return action("Generic assertion \"" + action + "\"")
+				.do1((MinecraftState S) -> (Object) S.env().genericAction(getAgentId(S), action, params)).lift();
+	}
+	
 }
