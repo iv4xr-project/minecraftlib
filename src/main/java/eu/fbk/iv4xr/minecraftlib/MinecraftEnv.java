@@ -167,9 +167,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	public boolean moveTo(String agentId, Vec3 pos, Double distance) {
 		JsonObject a = withCoords(action("move_to"), pos);
-		if (distance != null) {
-			a.addProperty("distance", distance);
-		}
+		a.addProperty("distance", distance);
 		return sendAction(agentId, null, a);
 	}
 

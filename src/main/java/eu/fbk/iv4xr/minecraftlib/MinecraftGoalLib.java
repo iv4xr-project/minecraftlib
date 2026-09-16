@@ -38,7 +38,7 @@ public class MinecraftGoalLib {
 	 * @param distance
 	 * @return
 	 */
-	public GoalStructure tagReachedWithinDistance(String tag, double distance) {
+	public GoalStructure tagReachedWithinDistance(String tag, Double distance) {
 		return goal("Reached " + tag + " (<=" + distance + ")").toSolve((Boolean arrived) -> arrived != null && arrived)
 				.withTactic(tacticLib.moveTo(tag, distance)).lift();
 	}
@@ -50,7 +50,7 @@ public class MinecraftGoalLib {
 	 * @param distance
 	 * @return
 	 */
-	public GoalStructure reached(Vec3 pos, double distance) {
+	public GoalStructure reached(Vec3 pos, Double distance) {
 		return goal("Reached " + pos + " (<=" + distance + ")").toSolve((Boolean arrived) -> arrived != null && arrived)
 				.withTactic(tacticLib.moveTo(pos, distance)).lift();
 	}
@@ -126,7 +126,7 @@ public class MinecraftGoalLib {
 	 * @param state
 	 * @return
 	 */
-	public GoalStructure sneaked(boolean state) {
+	public GoalStructure sneaked(Boolean state) {
 		return goal("Sneaked " + state).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.sneak(state))
 				.lift();
 	}
