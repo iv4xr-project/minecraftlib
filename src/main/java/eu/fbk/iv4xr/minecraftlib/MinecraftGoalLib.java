@@ -76,6 +76,15 @@ public class MinecraftGoalLib {
 		return goal("Selected " + item).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.select(item))
 				.lift();
 	}
+	
+	/**
+	 * Pick up loot
+	 * @return
+	 */
+	public GoalStructure pickedUpLoot() {
+		return goal("Attempted to pick up loot").toSolve((Boolean ok) -> ok != null && ok)
+				.withTactic(tacticLib.pickUpLoot()).lift();
+	}
 
 	/**
 	 * Place a block on a tagged block
