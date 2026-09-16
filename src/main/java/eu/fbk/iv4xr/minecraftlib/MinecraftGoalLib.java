@@ -198,6 +198,19 @@ public class MinecraftGoalLib {
 		return goal("Waited " + ticks + " ticks").toSolve((Boolean ok) -> ok != null && ok)
 				.withTactic(tacticLib.waitTicks(ticks)).lift();
 	}
+	
+	/**
+	 * Generic action
+	 * 
+	 * @param action
+	 * @param params
+	 * @return
+	 */
+	public GoalStructure genericAction(String action, Map<String, Object> params) {
+		return goal("Executed generic action \"" + action + "\"").toSolve((Boolean ok) -> ok != null && ok)
+				.withTactic(tacticLib.genericActionTactic(action, params)).lift();
+	}
+
 
 	/**
 	 * Assert that the the tagged block is the expected one
@@ -289,6 +302,20 @@ public class MinecraftGoalLib {
                 .toSolve((Boolean checked) -> true)
                 .oracle(ta, (Boolean checked) -> assertTrue_("advancement-check", info, checked != null && checked))
                 .withTactic(tacticLib.checkAdvancment(advancement, result))
+                .lift();
+    }
+    
+    /**
+     * GenericAssertion
+     * @param advancement
+     * @return
+     */
+    public GoalStructure genericAssetion(TestAgent ta, String action, Map<String, Object> params) {
+        String info = "Assertion \"" + action + "\"";
+        return testgoal("Assert " + info, ta)
+                .toSolve((Boolean checked) -> true)
+                .oracle(ta, (Boolean checked) -> assertTrue_(action, info, checked != null && checked))
+                .withTactic(tacticLib.genericAssertionTactic(action, params))
                 .lift();
     }
 
