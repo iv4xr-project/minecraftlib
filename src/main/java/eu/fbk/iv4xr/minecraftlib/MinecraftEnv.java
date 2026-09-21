@@ -153,9 +153,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	public boolean moveTo(String agentId, String tag, Double distance) {
 		JsonObject a = action("move_to");
 		a.addProperty("target", tag);
-		if (distance != null) {
-			a.addProperty("distance", distance);
-		}
+		a.addProperty("distance", distance);
 		return sendAction(agentId, tag, a);
 	}
 
@@ -169,9 +167,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	public boolean moveTo(String agentId, Vec3 pos, Double distance) {
 		JsonObject a = withCoords(action("move_to"), pos);
-		if (distance != null) {
-			a.addProperty("distance", distance);
-		}
+		a.addProperty("distance", distance);
 		return sendAction(agentId, null, a);
 	}
 
@@ -478,6 +474,18 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 		a.addProperty("advancement", advancement);
 		a.addProperty("expect_result", result);
 
+		return sendAction(agentId, null, a);
+	}
+	
+	/**
+	 * Generic MineFlayerTestBenchAction
+	 * @param agentId
+	 * @param actionName
+	 * @param params
+	 */
+	public boolean genericAction(String agentId, String actionName, Map<String,Object> params) {
+		JsonObject a = action(actionName);
+		params.forEach((key, value) -> a.add(key, gson.toJsonTree(value)));
 		return sendAction(agentId, null, a);
 	}
 

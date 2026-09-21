@@ -38,7 +38,7 @@ public class MinecraftGoalLib {
 	 * @param distance
 	 * @return
 	 */
-	public GoalStructure tagReachedWithinDistance(String tag, double distance) {
+	public GoalStructure tagReachedWithinDistance(String tag, Double distance) {
 		return goal("Reached " + tag + " (<=" + distance + ")").toSolve((Boolean arrived) -> arrived != null && arrived)
 				.withTactic(tacticLib.moveTo(tag, distance)).lift();
 	}
@@ -50,7 +50,7 @@ public class MinecraftGoalLib {
 	 * @param distance
 	 * @return
 	 */
-	public GoalStructure reached(Vec3 pos, double distance) {
+	public GoalStructure reached(Vec3 pos, Double distance) {
 		return goal("Reached " + pos + " (<=" + distance + ")").toSolve((Boolean arrived) -> arrived != null && arrived)
 				.withTactic(tacticLib.moveTo(pos, distance)).lift();
 	}
@@ -126,7 +126,7 @@ public class MinecraftGoalLib {
 	 * @param state
 	 * @return
 	 */
-	public GoalStructure sneaked(boolean state) {
+	public GoalStructure sneaked(Boolean state) {
 		return goal("Sneaked " + state).toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.sneak(state))
 				.lift();
 	}
@@ -198,6 +198,19 @@ public class MinecraftGoalLib {
 		return goal("Waited " + ticks + " ticks").toSolve((Boolean ok) -> ok != null && ok)
 				.withTactic(tacticLib.waitTicks(ticks)).lift();
 	}
+	
+	/**
+	 * Generic action
+	 * 
+	 * @param action
+	 * @param params
+	 * @return
+	 */
+	public GoalStructure genericAction(String action, Map<String, Object> params) {
+		return goal("Executed generic action \"" + action + "\"").toSolve((Boolean ok) -> ok != null && ok)
+				.withTactic(tacticLib.genericActionTactic(action, params)).lift();
+	}
+
 
 	/**
 	 * Assert that the the tagged block is the expected one
@@ -289,6 +302,20 @@ public class MinecraftGoalLib {
                 .toSolve((Boolean checked) -> true)
                 .oracle(ta, (Boolean checked) -> assertTrue_("advancement-check", info, checked != null && checked))
                 .withTactic(tacticLib.checkAdvancment(advancement, result))
+                .lift();
+    }
+    
+    /**
+     * GenericAssertion
+     * @param advancement
+     * @return
+     */
+    public GoalStructure genericAssetion(TestAgent ta, String action, Map<String, Object> params) {
+        String info = "Assertion \"" + action + "\"";
+        return testgoal("Assert " + info, ta)
+                .toSolve((Boolean checked) -> true)
+                .oracle(ta, (Boolean checked) -> assertTrue_(action, info, checked != null && checked))
+                .withTactic(tacticLib.genericAssertionTactic(action, params))
                 .lift();
     }
 

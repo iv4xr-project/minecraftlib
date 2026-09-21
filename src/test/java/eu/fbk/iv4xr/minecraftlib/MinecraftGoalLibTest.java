@@ -86,13 +86,13 @@ public class MinecraftGoalLibTest {
         env.buildLevel(TEST_AGENT, getLevel("wood-corners.csv"), 0, 65, 0);
 
         GoalStructure G = SEQ(
-                goalLib.reached(new Vec3(0, 66, 0), 2),
+                goalLib.reached(new Vec3(0, 66, 0), 2.0),
                 goalLib.assertBlockIs(agent, new Vec3(0, 66, 0), "oak_log", null, true),
-                goalLib.reached(new Vec3(19, 66, 0), 2),
+                goalLib.reached(new Vec3(19, 66, 0), 2.0),
                 goalLib.assertBlockIs(agent, new Vec3(19, 66, 0), "spruce_log", null, true),
-                goalLib.reached(new Vec3(0, 66, 19), 2),
+                goalLib.reached(new Vec3(0, 66, 19), 2.0),
                 goalLib.assertBlockIs(agent, new Vec3(0, 66, 19), "birch_log", null, true),
-                goalLib.reached(new Vec3(19, 66, 19), 2),
+                goalLib.reached(new Vec3(19, 66, 19), 2.0),
                 goalLib.assertBlockIs(agent, new Vec3(19, 66, 19), "jungle_log", null, true));
 
         agent.setGoal(G);
