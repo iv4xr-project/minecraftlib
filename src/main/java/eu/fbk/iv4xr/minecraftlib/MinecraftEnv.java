@@ -207,7 +207,9 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	}
 	
 	public void resetAgent(String agentId) {
-		postJson( "/" + agentId + "/reset", new JsonObject());
+		// the reset rebuilds the level: summoned mobs get new UUIDs
+		JsonObject resp = postJson("/" + agentId + "/reset", new JsonObject());
+		cacheTags(resp);
 	}
 
 	/**
@@ -503,6 +505,23 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	 */
 	public Vec3 tagPosition(String tag) {
 		return tagPositions.get(tag);
+	}
+
+	/**
+	 * Read the current health of a mob via the testbench GET /:bot/tags/:uuid route
+	 * (backed by getMobHealth in abstraction.ts). Accepts either a tag or a raw UUID.
+	 *
+	 * @param agentId
+	 * @param tagOrUuid entity tag (example: "zombie") or raw entity UUID
+	 * @return the current health, or null if the mob is dead / unknown / unreachable
+	 */
+	public Float getMobHealth(String agentId, String tagOrUuid) {
+		String uuid = tagUuids.getOrDefault(tagOrUuid, tagOrUuid);
+		JsonObject resp = getJson("/" + agentId + "/tags/" + uuid);
+		if (resp == null || !resp.has("health") || resp.get("health").isJsonNull()) {
+			return null;
+		}
+		return resp.get("health").getAsFloat();
 	}
 
 	/**
