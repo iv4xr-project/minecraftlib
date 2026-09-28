@@ -6,6 +6,7 @@ import static eu.iv4xr.framework.Iv4xrEDSL.assertTrue_;
 import static eu.iv4xr.framework.Iv4xrEDSL.testgoal;
 import static nl.uu.cs.aplib.AplibEDSL.goal;
 
+import java.util.Collections;
 import java.util.Map;
 
 import eu.iv4xr.framework.mainConcepts.TestAgent;
@@ -138,6 +139,26 @@ public class MinecraftGoalLib {
 	 */
 	public GoalStructure jumped() {
 		return goal("Jumped").toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.jump())
+				.lift();
+	}
+	
+	/**
+	 * Activate held item
+	 * 
+	 * @return
+	 */
+	public GoalStructure acttivateItem() {
+		return goal("Activated item").toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.genericActionTactic("activate_item", Collections.emptyMap()))
+				.lift();
+	}
+	
+	/**
+	 * Consume held item
+	 * 
+	 * @return
+	 */
+	public GoalStructure consumeItem() {
+		return goal("Consumed item").toSolve((Boolean ok) -> ok != null && ok).withTactic(tacticLib.genericActionTactic("consume_item", Collections.emptyMap()))
 				.lift();
 	}
 
@@ -302,6 +323,20 @@ public class MinecraftGoalLib {
                 .toSolve((Boolean checked) -> true)
                 .oracle(ta, (Boolean checked) -> assertTrue_("advancement-check", info, checked != null && checked))
                 .withTactic(tacticLib.checkAdvancment(advancement, result))
+                .lift();
+    }
+    
+    /**
+     * Assert the bot has the required xp level
+     * @param advancement
+     * @return
+     */
+    public GoalStructure assertExperience(TestAgent ta, int level, Boolean result) {
+        String info = result == null || !result ? "has " : "does not have " + level + "xp levelss";
+        return testgoal("Assert " + info, ta)
+                .toSolve((Boolean checked) -> true)
+                .oracle(ta, (Boolean checked) -> assertTrue_("experience-check", info, checked != null && checked))
+                .withTactic(tacticLib.checkExperience(level, result))
                 .lift();
     }
     

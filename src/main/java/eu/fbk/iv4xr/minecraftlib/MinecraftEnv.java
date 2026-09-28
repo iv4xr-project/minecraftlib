@@ -297,7 +297,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 	}
 
 	/**
-	 * Pick up loot specified by a tag
+	 * Pick up loot nearby
 	 * 
 	 * @param agentId
 	 * @return
@@ -306,6 +306,7 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 		JsonObject a = action("pick_up_loot");
 		return sendAction(agentId, null, a);
 	}
+
 
 	/**
 	 * Right hand click to a target
@@ -407,6 +408,21 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 		JsonObject a = withCoords(action("check_block"), pos);
 		a.addProperty("expected", expected);
 		a.addProperty("nbt", nbt);
+		a.addProperty("expect_result", result);
+		return sendAction(agentId, null, a);
+	}
+	
+	/**
+	 * Check the bot has the provided number of xp levels
+	 * 
+	 * @param agentId
+	 * @param level
+	 * @param expected
+	 * @return
+	 */
+	public boolean checkExperience(String agentId, int level, Boolean result) {
+		JsonObject a = action("assert_experience");
+		a.addProperty("level", level);
 		a.addProperty("expect_result", result);
 		return sendAction(agentId, null, a);
 	}

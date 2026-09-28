@@ -2,6 +2,7 @@ package eu.fbk.iv4xr.minecraftlib;
 
 import static nl.uu.cs.aplib.AplibEDSL.action;
 
+import java.util.Collections;
 import java.util.Map;
 
 import eu.iv4xr.framework.spatial.Vec3;
@@ -225,6 +226,7 @@ public class MinecraftTacticLib {
 		}).lift();
 	}
 
+
 	/**
 	 * Wait
 	 * 
@@ -352,6 +354,19 @@ public class MinecraftTacticLib {
 		return action("check_advancement " + advancement)
 				.do1((MinecraftState S) -> (Object) S.env().checkAdvancement(getAgentId(S), advancement, result)).lift();
 	}
+	
+	/**
+	 * Check if the bot has an advancement
+	 * 
+	 * @param advancement
+	 * @param result
+	 * @return
+	 */
+	public Tactic checkExperience(int levels, Boolean result) {
+		return action("check_experience level=" + levels)
+				.do1((MinecraftState S) -> (Object) S.env().checkExperience(getAgentId(S), levels, result)).lift();
+	}
+	
 	
 	/**
 	 * Generic assertion, a way to call arbitrary json actions directly
