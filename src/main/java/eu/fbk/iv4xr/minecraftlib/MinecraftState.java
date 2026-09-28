@@ -80,6 +80,15 @@ public class MinecraftState extends Iv4xrAgentState<Void> {
 		return hp != null && hp > 0f;
 	}
 
+	/**
+	 * How many times the bot has died since it joined the server.
+	 * @return the count, or null against a testbench that does not report it
+	 */
+	public Integer getDeathCount() {
+		WorldEntity a = getAgent();
+		return a == null ? null : (Integer) a.properties.get("deaths");
+	}
+
 	public Vec3 getAgentPosition() {
 		return worldmodel == null ? null : worldmodel.position;
 	}
