@@ -2,12 +2,14 @@ package eu.fbk.iv4xr.minecraftlib;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
 import eu.iv4xr.framework.spatial.Vec3;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Provide the utility for translation of the JSON returned by the
@@ -24,6 +26,7 @@ public class StatusToWorldModel {
 	public static final String BLOCK_ID_PREFIX = "block:";
 	public static final String ENTITY_ID_PREFIX = "entity:";
 	public static final String INVENTORY_PROP = "inventory";
+	public static final String HELD_ITEM_PROP = "heldItem";
 
 	public static final String HEALTH = "health";
 	public static final String FOOD = "food";
@@ -90,6 +93,11 @@ public class StatusToWorldModel {
         }
         
         agent.properties.put(INVENTORY_PROP, inventory);
+
+        // name of the item in the hand of the agent, absent when the hand is empty
+        if (has(status, "heldItem")) {
+        	agent.properties.put(HELD_ITEM_PROP, status.getAsJsonObject("heldItem").get("name").getAsString());
+        }
         wom.elements.put(agentId, agent);
         
         // near blocks
@@ -100,6 +108,7 @@ public class StatusToWorldModel {
             	String id = BLOCK_ID_PREFIX + coordKey(v);
             	WorldEntity we = new WorldEntity(id, o.get("id").getAsString(), false);
             	we.position = v;
+            	copyProperties(o, we);
             	we.timestamp = timestamp;
             	wom.elements.put(id, we);            	
             }
@@ -117,7 +126,11 @@ public class StatusToWorldModel {
         		String id = uuid != null ? uuid : ENTITY_ID_PREFIX + name + ":" + coordKey(v);
         		WorldEntity we = new WorldEntity(id, name, true);
         		we.position = v;
+        		if (has(o, "velocity")) {
+        			we.velocity = vec3(o.getAsJsonObject("velocity"));
+        		}
         		we.timestamp = timestamp;
+        		copyProperties(o, we);
         		we.properties.put("name", name);
         		if (uuid != null) {
         			we.properties.put("uuid", uuid);
@@ -155,6 +168,30 @@ public class StatusToWorldModel {
 	static Vec3 vec3(JsonObject o) {
 		return new Vec3((float) o.get("x").getAsDouble(), (float) o.get("y").getAsDouble(),
 				(float) o.get("z").getAsDouble());
+	}
+
+	/**
+	 * Copy the primitive values of the "properties" json object, if present,
+	 * into the properties of a world entity
+	 * @param o
+	 * @param we
+	 */
+	static void copyProperties(JsonObject o, WorldEntity we) {
+		if (!has(o, "properties"))
+			return;
+
+		for (Map.Entry<String, JsonElement> p : o.getAsJsonObject("properties").entrySet()) {
+			if (!p.getValue().isJsonPrimitive())
+				continue;
+
+			JsonPrimitive val = p.getValue().getAsJsonPrimitive();
+			if (val.isBoolean())
+				we.properties.put(p.getKey(), val.getAsBoolean());
+			else if (val.isNumber())
+				we.properties.put(p.getKey(), (float) val.getAsDouble());
+			else
+				we.properties.put(p.getKey(), val.getAsString());
+		}
 	}
 
 	/**
