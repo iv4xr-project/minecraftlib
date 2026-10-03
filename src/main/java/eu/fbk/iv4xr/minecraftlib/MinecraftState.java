@@ -103,6 +103,15 @@ public class MinecraftState extends Iv4xrAgentState<Void> {
 		return inv == null ? new HashMap<>() : inv;
 	}
 
+	/**
+	 * The item in the hand of the agent.
+	 * @return the item name, or null when the hand is empty (or against a testbench that does not report it)
+	 */
+	public String getHeldItem() {
+		WorldEntity a = getAgent();
+		return a == null ? null : (String) a.properties.get(StatusToWorldModel.HELD_ITEM_PROP);
+	}
+
 	public int getItemCount(String itemName) {
 		return getInventory().getOrDefault(itemName, 0);
 	}
