@@ -10,12 +10,17 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 /**
  * An instance of {@link Iv4xrEnvironment} to connect an aplib agent to a
@@ -538,6 +543,40 @@ public class MinecraftEnv extends Iv4xrEnvironment {
 			return null;
 		}
 		return resp.get("health").getAsFloat();
+	}
+
+	/**
+	 * Get the state properties of a block type via the testbench GET /:bot/blocks/:name route:
+	 * every property the block can have, with all its values (example for "candle":
+	 * candles -> ["1", "2", "3", "4"], lit -> [true, false], waterlogged -> [true, false]).
+	 * The values are written as in the properties of the observed blocks: booleans as
+	 * Boolean, everything else (integers included) as String.
+	 *
+	 * @param agentId
+	 * @param blockName block name without namespace (example: "lever")
+	 * @return property name -> possible values, in the order of the testbench; empty if the
+	 *         block has no state properties
+	 * @throws Iv4xrError if the block name is unknown
+	 */
+	public Map<String, List<Object>> getBlockProperties(String agentId, String blockName) {
+		JsonObject resp = getJson("/" + agentId + "/blocks/" + blockName);
+		Map<String, List<Object>> properties = new LinkedHashMap<>();
+		if (resp == null || !resp.has("properties") || !resp.get("properties").isJsonArray()) {
+			return properties;
+		}
+		for (JsonElement p : resp.getAsJsonArray("properties")) {
+			JsonObject property = p.getAsJsonObject();
+			List<Object> values = new ArrayList<>();
+			for (JsonElement v : property.getAsJsonArray("values")) {
+				JsonPrimitive val = v.getAsJsonPrimitive();
+				if (val.isBoolean())
+					values.add(val.getAsBoolean());
+				else
+					values.add(val.getAsString());
+			}
+			properties.put(property.get("name").getAsString(), values);
+		}
+		return properties;
 	}
 
 	/**

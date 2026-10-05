@@ -11,7 +11,7 @@ However, Minecraft is not controlled through an in-process client. Instead this 
 
 ## Main components
 
-- **`MinecraftEnv`** (`extends eu.iv4xr.framework.mainConcepts.Iv4xrEnvironment`) — HTTP client for the testbench. `observe(agentId)` → `GET /status`; typed action methods (`moveTo`, `mine`, `place`, `select`, `attack`, `checkBlock`, …) → `POST /action`; `buildLevel(...)` → `POST /build-level` (caches the tag→position/UUID map); `resetWorker()` → `POST /reset`.
+- **`MinecraftEnv`** (`extends eu.iv4xr.framework.mainConcepts.Iv4xrEnvironment`) — HTTP client for the testbench. `observe(agentId)` → `GET /status`; typed action methods (`moveTo`, `mine`, `place`, `select`, `attack`, `checkBlock`, …) → `POST /action`; `buildLevel(...)` → `POST /build-level` (caches the tag→position/UUID map); `resetWorker()` → `POST /reset`; `getBlockProperties(agentId, blockName)` → `GET /blocks/:name` (the state properties a block type can have, with all their values).
 - **`StatusToWorldModel`** — pure, side-effect-free converter from the `/status` JSON to an iv4xr `WorldModel` (unit-tested without a server).
 - **`MinecraftState`** (`extends Iv4xrAgentState<Void>`) — holds the current `WorldModel`; *replaces* it each tick (the `/status` scan is egocentric/local). Navigation is delegated to the testbench, so no nav-graph is kept.
 - **`MinecraftTacticLib` / `MinecraftGoalLib`** — one primitive tactic per testbench action; achievement goals plus `check_*`-backed **oracle goals** that emit `VerdictEvent`s (`Iv4xrEDSL.assertTrue_`).
