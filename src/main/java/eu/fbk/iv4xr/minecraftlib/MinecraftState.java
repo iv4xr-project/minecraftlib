@@ -1,6 +1,8 @@
 package eu.fbk.iv4xr.minecraftlib;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import eu.iv4xr.framework.extensions.pathfinding.Navigatable;
@@ -110,6 +112,41 @@ public class MinecraftState extends Iv4xrAgentState<Void> {
 	public String getHeldItem() {
 		WorldEntity a = getAgent();
 		return a == null ? null : (String) a.properties.get(StatusToWorldModel.HELD_ITEM_PROP);
+	}
+
+	/**
+	 * How much the item in the hand of the agent has been used.
+	 * @return the used durability (0 when new), or null when the hand is empty or the item
+	 *         does not wear out (or against a testbench that does not report it)
+	 */
+	public Integer getHeldItemDurabilityUsed() {
+		WorldEntity a = getAgent();
+		return a == null ? null : (Integer) a.properties.get(StatusToWorldModel.HELD_ITEM_DURABILITY_USED_PROP);
+	}
+
+	/**
+	 * How much the items with the given name have been used.
+	 * @return the used durability of each item with that name in the inventory (0 when new);
+	 *         empty if there is none or the item does not wear out
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Integer> getDurabilityUsed(String itemName) {
+		WorldEntity a = getAgent();
+		Map<String, List<Integer>> used = a == null ? null
+				: (Map<String, List<Integer>>) a.properties.get(StatusToWorldModel.ITEM_DURABILITY_USED_PROP);
+		return used == null ? new ArrayList<>() : used.getOrDefault(itemName, new ArrayList<>());
+	}
+
+	/**
+	 * How much an item with the given name lasts when new.
+	 * @return the maximum durability, or null if the item is not in the inventory or does not wear out
+	 */
+	@SuppressWarnings("unchecked")
+	public Integer getMaxDurability(String itemName) {
+		WorldEntity a = getAgent();
+		Map<String, Integer> max = a == null ? null
+				: (Map<String, Integer>) a.properties.get(StatusToWorldModel.ITEM_MAX_DURABILITY_PROP);
+		return max == null ? null : max.get(itemName);
 	}
 
 	public int getItemCount(String itemName) {
