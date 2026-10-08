@@ -8,7 +8,9 @@ import eu.iv4xr.framework.mainConcepts.WorldEntity;
 import eu.iv4xr.framework.mainConcepts.WorldModel;
 import eu.iv4xr.framework.spatial.Vec3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,6 +29,9 @@ public class StatusToWorldModel {
 	public static final String ENTITY_ID_PREFIX = "entity:";
 	public static final String INVENTORY_PROP = "inventory";
 	public static final String HELD_ITEM_PROP = "heldItem";
+	public static final String HELD_ITEM_DURABILITY_USED_PROP = "heldItemDurabilityUsed";
+	public static final String ITEM_DURABILITY_USED_PROP = "itemDurabilityUsed";
+	public static final String ITEM_MAX_DURABILITY_PROP = "itemMaxDurability";
 
 	public static final String HEALTH = "health";
 	public static final String FOOD = "food";
@@ -83,20 +88,35 @@ public class StatusToWorldModel {
 
 		// simplify inventory management creating a map
         HashMap<String, Integer> inventory = new HashMap<>();
+        // durability of the items that wear out: item name -> used durability of each item with
+        // that name (two pickaxes are two entries), and item name -> durability when new
+        HashMap<String, List<Integer>> durabilityUsed = new HashMap<>();
+        HashMap<String, Integer> maxDurability = new HashMap<>();
         if (has(status, "inventory")) {
         	for (JsonElement el : status.getAsJsonArray("inventory")) {
         		JsonObject item = el.getAsJsonObject();
         		String name = item.get("name").getAsString();
         		int count = has(item, "count") ? item.get("count").getAsInt() : 1;
         		inventory.merge(name, count, Integer::sum);
+        		if (has(item, "durabilityUsed") && has(item, "maxDurability")) {
+        			durabilityUsed.computeIfAbsent(name, n -> new ArrayList<>()).add(item.get("durabilityUsed").getAsInt());
+        			maxDurability.put(name, item.get("maxDurability").getAsInt());
+        		}
         	}
         }
         
         agent.properties.put(INVENTORY_PROP, inventory);
+        agent.properties.put(ITEM_DURABILITY_USED_PROP, durabilityUsed);
+        agent.properties.put(ITEM_MAX_DURABILITY_PROP, maxDurability);
 
         // name of the item in the hand of the agent, absent when the hand is empty
         if (has(status, "heldItem")) {
-        	agent.properties.put(HELD_ITEM_PROP, status.getAsJsonObject("heldItem").get("name").getAsString());
+        	JsonObject held = status.getAsJsonObject("heldItem");
+        	agent.properties.put(HELD_ITEM_PROP, held.get("name").getAsString());
+        	// used durability of the held item, absent when it does not wear out
+        	if (has(held, "durabilityUsed")) {
+        		agent.properties.put(HELD_ITEM_DURABILITY_USED_PROP, held.get("durabilityUsed").getAsInt());
+        	}
         }
         wom.elements.put(agentId, agent);
         
